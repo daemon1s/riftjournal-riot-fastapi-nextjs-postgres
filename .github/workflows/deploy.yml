@@ -1,4 +1,4 @@
-name: Build and Deploy
+name: Compilar y desplegar
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -21,82 +21,82 @@ env:
 
 jobs:
   build-and-push:
-    name: Build Docker images
+    name: Compilar imágenes de Docker
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
 
     steps:
-      - name: Checkout code
+      - name: Obtener el código fuente
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Set up Python
+      - name: Configurar Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Install Python dependencies
+      - name: Instalar dependencias de Python
         run: |
           python -m pip install --upgrade pip
           pip install -r backend/requirements.txt
 
-      - name: Run Ruff check
+      - name: Ejecutar el análisis con Ruff
         run: ruff check backend/app backend/tests
 
-      - name: Run Backend Tests
+      - name: Ejecutar pruebas del backend
         run: |
           export DATABASE_URL="postgresql+asyncpg://evelynnuser:evelynnpassword@localhost:5432/evelynndb"
           export RIOT_API_KEY="dummy"
           export PYTHONPATH=backend
           pytest --cov=backend/app --cov-report=xml:backend/coverage.xml backend/tests
 
-      - name: Set up Node.js
+      - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20"
           cache: "npm"
           cache-dependency-path: frontend/package-lock.json
 
-      - name: Install Frontend dependencies
+      - name: Instalar dependencias del frontend
         run: |
           cd frontend
           npm ci
 
-      - name: Run Frontend Lint
+      - name: Ejecutar el linter del frontend
         run: |
           cd frontend
           npm run lint
 
-      - name: Run Frontend Typecheck
+      - name: Ejecutar el control de tipos del frontend
         run: |
           cd frontend
           npx tsc --noEmit
 
-      - name: Run Frontend Tests
+      - name: Ejecutar pruebas del frontend
         run: |
           cd frontend
           npm run test
 
-      - name: SonarCloud Scan
+      - name: Analizar con SonarCloud
         uses: sonarsource/sonarcloud-github-action@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-      - name: Log in to GitHub Container Registry
+      - name: Iniciar sesión en GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set up Docker Buildx
+      - name: Configurar Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build and push Backend image
+      - name: Compilar y subir la imagen del backend
         uses: docker/build-push-action@v5
         with:
           context: ./backend
@@ -106,7 +106,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Build and push Frontend image
+      - name: Compilar y subir la imagen del frontend
         uses: docker/build-push-action@v5
         with:
           context: ./frontend
@@ -119,12 +119,12 @@ jobs:
           cache-to: type=gha,mode=max
 
   deploy:
-    name: Deploy to VPS
+    name: Desplegar en la VPS
     needs: build-and-push
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy via SSH
+      - name: Desplegar mediante SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.HOST }}
