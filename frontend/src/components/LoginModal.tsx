@@ -15,7 +15,7 @@ export default function LoginModal({ isOpen, onClose, onSuccess }: LoginModalPro
 
   if (!isOpen) return null;
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
     setErrorMsg(null);
     setIsSubmitting(true);
@@ -35,8 +35,10 @@ export default function LoginModal({ isOpen, onClose, onSuccess }: LoginModalPro
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div 
-        className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
+      <button
+        type="button"
+        aria-label="Cerrar modal"
+        className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity w-full cursor-default"
         onClick={onClose}
       />
 
@@ -67,10 +69,11 @@ export default function LoginModal({ isOpen, onClose, onSuccess }: LoginModalPro
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
-            <label className="text-[10px] font-bold uppercase tracking-wider text-muted-text">Contraseña</label>
+            <label htmlFor="admin-password" className="text-[10px] font-bold uppercase tracking-wider text-muted-text">Contraseña</label>
             <div className="relative flex items-center bg-zinc-950/85 border border-[rgba(55,58,85,0.3)] rounded-xl px-3.5 py-3 focus-within:border-accent-blue/70 transition-colors shadow-inner">
               <Key size={16} className="text-muted-text mr-2.5" />
               <input
+                id="admin-password"
                 type="password"
                 required
                 value={password}

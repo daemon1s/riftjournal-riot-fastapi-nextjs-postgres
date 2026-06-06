@@ -38,8 +38,10 @@ export default function RecentMatchesModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div
-        className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
+      <button
+        type="button"
+        aria-label="Cerrar modal"
+        className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity w-full cursor-default"
         onClick={onClose}
       />
 
@@ -96,7 +98,10 @@ export default function RecentMatchesModal({
               {matches.map((match) => (
                 <div
                   key={match.match_id}
+                  role="button"
+                  tabIndex={0}
                   onClick={() => onSelectMatch(match.match_id)}
+                  onKeyDown={(e) => e.key === "Enter" && onSelectMatch(match.match_id)}
                   className={`group relative border rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer transition-all duration-200 hover:translate-y-[-1px] shadow-md ${match.outcome === "W"
                       ? "bg-[rgba(24,34,69,0.25)] border-[rgba(83,131,232,0.15)] hover:border-[rgba(83,131,232,0.3)] hover:bg-[rgba(24,34,69,0.4)]"
                       : "bg-[rgba(52,22,32,0.25)] border-[rgba(232,64,87,0.15)] hover:border-[rgba(232,64,87,0.3)] hover:bg-[rgba(52,22,32,0.4)]"

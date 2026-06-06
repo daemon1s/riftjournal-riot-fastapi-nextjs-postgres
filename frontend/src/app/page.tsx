@@ -616,7 +616,7 @@ export default function Home() {
     }
   };
 
-  const handleSave = async (e: React.FormEvent) => {
+  const handleSave = async (e: React.SyntheticEvent) => {
     e.preventDefault();
     if (!preview) return;
     setErrorMsg(null);
@@ -982,8 +982,9 @@ export default function Home() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-zinc-950/15 p-5 border border-[rgba(55,58,85,0.25)] rounded-xl">
                 <div className="flex flex-col gap-4">
                   <div className="flex flex-col gap-2">
-                    <label className="text-[10px] font-bold uppercase tracking-wider text-muted-text">Fase de tilt máxima</label>
+                    <label htmlFor="tilt-fase" className="text-[10px] font-bold uppercase tracking-wider text-muted-text">Fase de tilt máxima</label>
                     <select
+                      id="tilt-fase"
                       value={tiltFaseMaxima}
                       onChange={(e) => setTiltFaseMaxima(e.target.value)}
                       className="w-full px-3 py-2.5 bg-zinc-950/60 border border-[rgba(55,58,85,0.3)] rounded-xl text-xs text-white font-bold focus:outline-none focus:border-accent-blue"
@@ -998,8 +999,9 @@ export default function Home() {
                 {tiltFaseMaxima !== "NINGUNO" && (
                   <div className="flex flex-col gap-4 border-t md:border-t-0 md:border-l border-[rgba(55,58,85,0.15)] pt-4 md:pt-0 md:pl-6">
                     <div className="flex flex-col gap-2">
-                      <label className="text-[10px] font-bold uppercase tracking-wider text-muted-text">Detonante (Trigger)</label>
+                      <label htmlFor="tilt-trigger" className="text-[10px] font-bold uppercase tracking-wider text-muted-text">Detonante (Trigger)</label>
                       <select
+                        id="tilt-trigger"
                         value={triggerCategoria}
                         onChange={(e) => setTriggerCategoria(e.target.value)}
                         className="w-full px-3 py-2.5 bg-zinc-950/60 border border-[rgba(55,58,85,0.3)] rounded-xl text-xs text-white font-bold focus:outline-none focus:border-accent-blue"
@@ -1011,8 +1013,9 @@ export default function Home() {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                      <label className="text-[10px] font-bold uppercase tracking-wider text-muted-text">Recuperación de tilt</label>
+                      <label htmlFor="tilt-recuperacion" className="text-[10px] font-bold uppercase tracking-wider text-muted-text">Recuperación de tilt</label>
                       <select
+                        id="tilt-recuperacion"
                         value={recuperacionTilt}
                         onChange={(e) => setRecuperacionTilt(e.target.value)}
                         className="w-full px-3 py-2.5 bg-zinc-950/60 border border-[rgba(55,58,85,0.3)] rounded-xl text-xs text-white font-bold focus:outline-none focus:border-accent-blue"
@@ -1027,7 +1030,7 @@ export default function Home() {
               </div>
 
               <div className="flex flex-col gap-2">
-                <label className="text-[10px] font-bold uppercase tracking-wider text-muted-text">¿Qué errores cometiste?</label>
+                <label htmlFor="errores-combobox" className="text-[10px] font-bold uppercase tracking-wider text-muted-text">¿Qué errores cometiste?</label>
                 <MultiSelectCombobox
                   availableTags={availableErrors}
                   selectedTags={selectedErrors}
@@ -1036,8 +1039,9 @@ export default function Home() {
               </div>
 
               <div className="flex flex-col gap-2">
-                <label className="text-[10px] font-bold uppercase tracking-wider text-muted-text">Notas de partida (descargos rápidos)</label>
+                <label htmlFor="match-notes" className="text-[10px] font-bold uppercase tracking-wider text-muted-text">Notas de partida (descargos rápidos)</label>
                 <textarea
+                  id="match-notes"
                   rows={3}
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}

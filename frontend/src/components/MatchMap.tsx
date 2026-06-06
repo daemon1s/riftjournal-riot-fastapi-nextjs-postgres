@@ -103,6 +103,8 @@ export default function MatchMap({ ganks = [], deaths = [] }: MatchMapProps) {
             return (
               <div
                 key={`gank-${i}`}
+                role="button"
+                tabIndex={0}
                 className="absolute w-3.5 h-3.5 -translate-x-1/2 translate-y-1/2 rounded-full bg-emerald-500 border border-white cursor-pointer transition-transform hover:scale-125 z-10 shadow-[0_0_8px_rgba(16,185,129,0.8)]"
                 style={{ ...pos }}
                 onMouseEnter={() =>
@@ -117,6 +119,7 @@ export default function MatchMap({ ganks = [], deaths = [] }: MatchMapProps) {
                   })
                 }
                 onMouseLeave={() => setHoveredPoint(null)}
+                onKeyDown={(e) => e.key === "Enter" && setHoveredPoint({ type: "gank", time: formatTimelineTime(pt.timestamp), x: pt.x, y: pt.y, victim: pt.victim, killer: pt.killer, assists: pt.assists })}
               />
             );
           })}
@@ -128,6 +131,8 @@ export default function MatchMap({ ganks = [], deaths = [] }: MatchMapProps) {
             return (
               <div
                 key={`death-${i}`}
+                role="button"
+                tabIndex={0}
                 className="absolute w-3.5 h-3.5 -translate-x-1/2 translate-y-1/2 rounded-full bg-rose-600 border border-white cursor-pointer transition-transform hover:scale-125 z-10 shadow-[0_0_8px_rgba(244,63,94,0.8)]"
                 style={{ ...pos }}
                 onMouseEnter={() =>
@@ -141,6 +146,7 @@ export default function MatchMap({ ganks = [], deaths = [] }: MatchMapProps) {
                   })
                 }
                 onMouseLeave={() => setHoveredPoint(null)}
+                onKeyDown={(e) => e.key === "Enter" && setHoveredPoint({ type: "death", time: formatTimelineTime(pt.timestamp), x: pt.x, y: pt.y, killer: pt.killer, assists: pt.assists })}
               />
             );
           })}
