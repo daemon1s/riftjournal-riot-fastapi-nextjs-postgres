@@ -23,8 +23,6 @@ import {
   RECOVERY_TIMES,
   MENTAL_VALUES_MAP
 } from "../config/constants";
-
-// Fallback icon helpers (used before riotVersion is resolved)
 function _getChampionIconUrl(name: string, version: string): string {
   if (!name) return "";
   return `https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/${name}.png`;
@@ -171,8 +169,8 @@ function MatchComposition({
               type="button"
               onClick={() => onTabChange(t)}
               className={`px-2 py-1 rounded text-[9px] font-black uppercase tracking-wider border transition-all cursor-pointer ${activeTab === t
-                  ? "bg-accent-blue/15 text-accent-blue border-accent-blue/30 shadow-[0_0_8px_rgba(83,131,232,0.15)]"
-                  : "bg-transparent text-muted-text border-transparent hover:text-white"
+                ? "bg-accent-blue/15 text-accent-blue border-accent-blue/30 shadow-[0_0_8px_rgba(83,131,232,0.15)]"
+                : "bg-transparent text-muted-text border-transparent hover:text-white"
                 }`}
             >
               {t === "builds" ? "Builds & Oro" : t === "damage" ? "Daño" : "Evolución"}
@@ -522,32 +520,14 @@ export default function Home() {
   const [matchTabs, setMatchTabs] = useState<Record<string, "builds" | "damage" | "gold">>({});
   const [previewTab, setPreviewTab] = useState<"builds" | "damage" | "gold">("builds");
   const [riotVersion, setRiotVersion] = useState<string>(() => {
-    // Use cached version immediately — avoids double image load on subsequent visits
     if (typeof window !== "undefined") {
       return localStorage.getItem("riot_ddragon_version") || RIOT_VERSION;
     }
     return RIOT_VERSION;
   });
 
-  // Icon helpers that always use the freshest version
   const getChampionIconUrl = (name: string) => _getChampionIconUrl(name, riotVersion);
   const getItemIconUrl = (itemId: number) => _getItemIconUrl(itemId, riotVersion);
-
-  useEffect(() => {
-    loadData();
-    checkAuth();
-    // Fetch latest patch version from Riot CDN, cache it in localStorage
-    fetch("https://ddragon.leagueoflegends.com/api/versions.json")
-      .then(r => r.json())
-      .then((versions: string[]) => {
-        if (versions && versions.length > 0) {
-          const latest = versions[0];
-          localStorage.setItem("riot_ddragon_version", latest);
-          setRiotVersion(latest);
-        }
-      })
-      .catch(() => { /* keep cached/fallback version */ });
-  }, []);
 
   const checkAuth = async () => {
     const isValid = await verifyToken();
@@ -576,6 +556,21 @@ export default function Home() {
       console.error(err);
     }
   };
+
+  useEffect(() => {
+    loadData();
+    checkAuth();
+    fetch("https://ddragon.leagueoflegends.com/api/versions.json")
+      .then(r => r.json())
+      .then((versions: string[]) => {
+        if (versions && versions.length > 0) {
+          const latest = versions[0];
+          localStorage.setItem("riot_ddragon_version", latest);
+          setRiotVersion(latest);
+        }
+      })
+      .catch(() => { });
+  }, []);
 
   const handleSyncClick = async () => {
     setIsLoadingRecent(true);
@@ -687,7 +682,7 @@ export default function Home() {
               </h1>
             </div>
 
-            {/* Controles abajo del logo */}
+            
             <div className="flex items-center gap-4 mt-5 relative z-20">
               {isAdmin ? (
                 <>
@@ -816,7 +811,7 @@ export default function Home() {
                 </button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* Rival JG */}
+                
                 <div className="bg-zinc-950/30 p-4 border border-[rgba(55,58,85,0.25)] rounded-xl flex items-center gap-4">
                   <div className="w-12 h-12 rounded-lg overflow-hidden border border-[rgba(55,58,85,0.3)] bg-zinc-950">
                     <img
@@ -848,7 +843,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* KDA & CS/min */}
+                
                 <div className="bg-zinc-950/30 p-4 border border-[rgba(55,58,85,0.25)] rounded-xl grid grid-cols-2 gap-2 text-center">
                   <div className="border-r border-[rgba(55,58,85,0.15)] flex flex-col justify-center">
                     <span className="text-[9px] text-muted-text block font-bold uppercase tracking-wider">KDA</span>
@@ -860,7 +855,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* KP% */}
+                
                 <div className="bg-zinc-950/30 p-4 border border-[rgba(55,58,85,0.25)] rounded-xl grid grid-cols-2 gap-2 text-center">
                   <div className="border-r border-[rgba(55,58,85,0.15)] flex flex-col justify-center col-span-2">
                     <span className="text-[9px] text-muted-text block font-bold uppercase tracking-wider">KP%</span>
@@ -869,7 +864,7 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Performance stats */}
+              
               <div className="border-t border-[rgba(55,58,85,0.2)] pt-4">
                 <p className="text-[9px] font-black uppercase tracking-widest text-muted-text mb-2">Rendimiento</p>
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2.5">
@@ -890,7 +885,7 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Vision stats */}
+              
               <div>
                 <p className="text-[9px] font-black uppercase tracking-widest text-muted-text mb-2">Visión</p>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2.5">
@@ -907,7 +902,7 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Diff stats grid */}
+              
               <div>
                 <p className="text-[9px] font-black uppercase tracking-widest text-muted-text mb-2">Diferencias</p>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2.5">
@@ -928,7 +923,7 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Muertes Pre-6 and other stats summary */}
+              
               <div className="grid grid-cols-2 gap-4 bg-zinc-950/20 p-3.5 border border-[rgba(55,58,85,0.15)] rounded-xl text-center text-xs">
                 <div>
                   <span className="text-[9px] text-muted-text block mb-0.5 font-bold uppercase tracking-wider">Muertes Pre-6</span>
@@ -942,17 +937,17 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Map and Build/Teams grid */}
+              
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-[rgba(55,58,85,0.2)] pt-4 items-start">
-                {/* Map */}
+                
                 <MatchMap
                   ganks={preview.gank_coords}
                   deaths={preview.death_coords}
                 />
 
-                {/* Build & Teams */}
+                
                 <div className="flex flex-col gap-4">
-                  {/* Build */}
+                  
                   <div className="bg-zinc-950/20 p-4 border border-[rgba(55,58,85,0.15)] rounded-xl flex flex-col gap-2">
                     <span className="text-[9px] text-muted-text block font-bold uppercase tracking-wider">Tu Build</span>
                     <div className="flex gap-1.5 flex-wrap">
@@ -968,7 +963,7 @@ export default function Home() {
                     </div>
                   </div>
 
-                  {/* Teams */}
+                  
                   <MatchComposition
                     teams={preview.teams}
                     goldTimeline={preview.gold_timeline}
@@ -1118,8 +1113,6 @@ export default function Home() {
                             day: "2-digit", month: "long", year: "numeric"
                           });
                           const isExpanded = expandedMatchId === item.match_id;
-
-                          // Date divider row
                           if (matchDate !== lastDate) {
                             lastDate = matchDate;
                             rows.push(
@@ -1130,8 +1123,6 @@ export default function Home() {
                               </tr>
                             );
                           }
-
-                          // Main data row
                           rows.push(
                             <tr
                               key={item.match_id}
@@ -1141,10 +1132,10 @@ export default function Home() {
                                 : "hover:bg-loss-bg/30"
                                 } ${isExpanded ? (item.outcome === "W" ? "bg-win-bg/20" : "bg-loss-bg/20") : ""}`}
                             >
-                              {/* Color accent bar via left border */}
+                              
                               <td className={`w-1 p-0 ${item.outcome === "W" ? "border-l-2 border-win-text" : "border-l-2 border-loss-text"}`}></td>
 
-                              {/* Champion */}
+                              
                               <td className="px-3 py-4">
                                 <div className="flex items-center gap-3.5">
                                   <div className={`w-11 h-11 rounded-xl overflow-hidden border-2 flex-shrink-0 ${item.outcome === "W" ? "border-win-text/40" : "border-loss-text/40"} bg-zinc-950 shadow-md`}>
@@ -1178,7 +1169,7 @@ export default function Home() {
                                 </div>
                               </td>
 
-                              {/* Rival JG */}
+                              
                               <td className="px-3 py-4">
                                 <div className="flex items-center gap-2.5">
                                   <div className="w-8 h-8 rounded-lg overflow-hidden border border-[rgba(55,58,85,0.4)] bg-zinc-950 flex-shrink-0">
@@ -1188,7 +1179,7 @@ export default function Home() {
                                 </div>
                               </td>
 
-                              {/* W/L */}
+                              
                               <td className="px-3 py-4 text-center">
                                 <div className="flex items-center justify-center gap-1.5">
                                   <span className={`px-2.5 py-1 rounded text-xs font-black font-mono border uppercase ${item.outcome === "W"
@@ -1200,7 +1191,7 @@ export default function Home() {
                                 </div>
                               </td>
 
-                              {/* Elo */}
+                              
                               <td className="px-3 py-4 text-center">
                                 {item.user_tier && item.user_tier.toUpperCase() !== "UNRANKED" ? (
                                   <div className="flex items-center justify-center gap-1.5">
@@ -1214,41 +1205,41 @@ export default function Home() {
                                 )}
                               </td>
 
-                              {/* KDA */}
+                              
                               <td className="px-3 py-4 text-center">
                                 <span className="font-mono font-black text-white text-sm">{item.kda}</span>
                               </td>
 
-                              {/* CS/min */}
+                              
                               <td className="px-3 py-4 text-center">
                                 <span className="font-mono font-semibold text-zinc-200 text-sm">{item.cs_min}</span>
                               </td>
 
-                              {/* KP% */}
+                              
                               <td className="px-3 py-4 text-center">
                                 <span className="font-mono font-black text-accent-blue text-sm">{item.kill_participation}%</span>
                               </td>
 
-                              {/* Full Clear */}
+                              
                               <td className="px-3 py-4 text-center">
                                 <span className="font-mono font-semibold text-zinc-200 text-sm">
                                   {item.full_clear_time && item.full_clear_time > 0 ? formatDuration(item.full_clear_time) : "—"}
                                 </span>
                               </td>
 
-                              {/* Level 6 */}
+                              
                               <td className="px-3 py-4 text-center">
                                 <span className="font-mono font-semibold text-zinc-200 text-sm">{formatDuration(item.level_6_minute)}</span>
                               </td>
 
-                              {/* Quest */}
+                              
                               <td className="px-3 py-4 text-center">
                                 <span className="font-mono font-semibold text-zinc-200 text-sm">
                                   {item.role_quest_time && item.role_quest_time > 0 ? formatDuration(item.role_quest_time) : "—"}
                                 </span>
                               </td>
 
-                              {/* Pre-6 Deaths */}
+                              
                               <td className="px-3 py-4 text-center">
                                 {item.pre_six_deaths > 0 ? (
                                   <span className="px-2 py-0.5 rounded text-xs font-black font-mono border bg-loss-bg text-loss-text border-loss-border">
@@ -1259,7 +1250,7 @@ export default function Home() {
                                 )}
                               </td>
 
-                              {/* Expand toggle */}
+                              
                               <td className="px-3 py-4 text-center">
                                 <button
                                   type="button"
@@ -1275,8 +1266,6 @@ export default function Home() {
                               </td>
                             </tr>
                           );
-
-                          // Accordion details row
                           if (isExpanded) {
                             rows.push(
                               <tr key={`details-${item.match_id}`}>
@@ -1285,7 +1274,7 @@ export default function Home() {
                                     ? "bg-[rgba(24,34,69,0.3)] border-[rgba(83,131,232,0.2)]"
                                     : "bg-[rgba(52,22,32,0.3)] border-[rgba(232,64,87,0.2)]"
                                     }`}>
-                                    {/* Details header */}
+                                    
                                     <div className="px-5 py-3 border-b border-[rgba(55,58,85,0.2)] flex items-center justify-between">
                                       <div className="flex items-center gap-2.5">
                                         <span className={`px-2 py-0.5 rounded text-[9px] font-black font-mono border uppercase ${item.outcome === "W"
@@ -1322,7 +1311,7 @@ export default function Home() {
                                     </div>
 
                                     <div className="p-4 flex flex-col gap-6">
-                                      {/* Performance stats */}
+                                      
                                       <div>
                                         <p className="text-[9px] font-black uppercase tracking-widest text-muted-text mb-2">Rendimiento</p>
                                         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2.5">
@@ -1343,7 +1332,7 @@ export default function Home() {
                                         </div>
                                       </div>
 
-                                      {/* Vision stats */}
+                                      
                                       <div>
                                         <p className="text-[9px] font-black uppercase tracking-widest text-muted-text mb-2">Visión</p>
                                         <div className="grid grid-cols-2 md:grid-cols-3 gap-2.5">
@@ -1360,7 +1349,7 @@ export default function Home() {
                                         </div>
                                       </div>
 
-                                      {/* Diff stats grid */}
+                                      
                                       <div>
                                         <p className="text-[9px] font-black uppercase tracking-widest text-muted-text mb-2">Diferencias</p>
                                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2.5">
@@ -1381,7 +1370,7 @@ export default function Home() {
                                         </div>
                                       </div>
 
-                                      {/* Mental stats */}
+                                      
                                       {item.tilt_fase_maxima && item.tilt_fase_maxima !== "NINGUNO" && (
                                         <div className="grid grid-cols-3 gap-2.5">
                                           <div className="bg-zinc-950/25 border border-[rgba(55,58,85,0.25)] rounded-xl py-3.5 px-3 text-center flex flex-col justify-center min-h-[72px] hover:bg-zinc-950/40 transition-colors shadow-inner">
@@ -1399,7 +1388,7 @@ export default function Home() {
                                         </div>
                                       )}
 
-                                      {/* Errors */}
+                                      
                                       {item.errors.length > 0 && (
                                         <div className="flex flex-wrap gap-1.5">
                                           {item.errors.map(err => (
@@ -1410,16 +1399,16 @@ export default function Home() {
                                         </div>
                                       )}
 
-                                      {/* Map and Build/Teams grid */}
-                                      {/* Map and Teams grid */}
+                                      
+                                      
                                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-[rgba(55,58,85,0.15)] pt-4 items-start">
-                                        {/* Map */}
+                                        
                                         <MatchMap
                                           ganks={item.gank_coords}
                                           deaths={item.death_coords}
                                         />
 
-                                        {/* Teams Composition */}
+                                        
                                         <MatchComposition
                                           teams={item.teams}
                                           goldTimeline={item.gold_timeline}
@@ -1434,7 +1423,7 @@ export default function Home() {
                                         />
                                       </div>
 
-                                      {/* Notes */}
+                                      
                                       {item.match_notes && (
                                         <p className="text-[11px] text-zinc-300 bg-zinc-950/20 px-3 py-2.5 rounded-xl border border-[rgba(55,58,85,0.15)] italic leading-relaxed">
                                           "{item.match_notes}"
