@@ -1,0 +1,37 @@
+# === Archivos de requerimientos y documentación ===
+*.md
+!README.md
+
+# === Entornos virtuales y dependencias ===
+node_modules/
+.next/
+out/
+venv/
+.venv/
+env/
+__pycache__/
+*.pyc
+
+# === Configuración y secretos ===
+.env
+.env.local
+.env.production
+backend/.env
+frontend/.env
+*.local
+
+# === Base de datos local y Logs ===
+*.log
+postgres_data/
+
+# === Scripts de desarrollo y utilitarios locales ===
+backend/run_db_migration.py
+debug_local.bat
+backend/backfill_enriched_coords.py
+backend/check_coords.py
+
+# === Favicons generados ===
+frontend/public/favicon_original.png
+frontend/public/favicon.png
+
+

@@ -1,0 +1,176 @@
+@import "tailwindcss";
+
+:root {
+  --background: #0e1015;
+  --foreground: #f5f6f7;
+  --card: rgba(22, 24, 35, 0.95);
+  --card-border: rgba(75, 78, 105, 0.45);
+  --accent-blue: #5383e8;
+  --accent-blue-hover: #4171d6;
+  --win-bg: rgba(24, 34, 69, 0.7);
+  --win-border: rgba(50, 70, 140, 0.6);
+  --win-text: #6b96f5;
+  --loss-bg: rgba(64, 25, 36, 0.7);
+  --loss-border: rgba(120, 40, 50, 0.6);
+  --loss-text: #f0546c;
+  --muted-text: #9fa7cf;
+
+  --accent-purple: #8c75ff;
+  --accent-purple-hover: #7359f8;
+
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.45);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-border: var(--color-card-border);
+  --color-accent-blue: var(--accent-blue);
+  --color-accent-blue-hover: var(--accent-blue-hover);
+  --color-accent-purple: var(--accent-purple);
+  --color-accent-purple-hover: var(--accent-purple-hover);
+  --color-win-bg: var(--win-bg);
+  --color-win-border: var(--win-border);
+  --color-win-text: var(--win-text);
+  --color-loss-bg: var(--loss-bg);
+  --color-loss-border: var(--loss-border);
+  --color-loss-text: var(--loss-text);
+  --color-muted-text: var(--muted-text);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui;
+  --font-mono: var(--font-inter), ui-sans-serif, system-ui;
+}
+
+body {
+  background: linear-gradient(180deg, #0e1015 0%, #12131f 60%, #0e1015 100%);
+  background-attachment: fixed;
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0e1015;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(75, 78, 105, 0.6);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-blue);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@keyframes logo-glow {
+
+  0%,
+  100% {
+    filter: drop-shadow(0 0 2px rgba(83, 131, 232, 0.22)) drop-shadow(0 0 5px rgba(0, 240, 255, 0.15)) drop-shadow(0 0 10px rgba(255, 123, 0, 0.08));
+  }
+
+  50% {
+    filter: drop-shadow(0 0 4px rgba(83, 131, 232, 0.35)) drop-shadow(0 0 10px rgba(0, 240, 255, 0.25)) drop-shadow(0 0 18px rgba(255, 123, 0, 0.15));
+  }
+}
+
+.logo-animated {
+  animation: logo-glow 3.5s ease-in-out infinite;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.logo-animated:hover {
+  transform: scale(1.04) translateY(-1px);
+}
+
+@keyframes text-shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 150% 50%;
+  }
+
+  100% {
+    background-position: 300% 50%;
+  }
+}
+
+.text-premium-animated {
+  background: linear-gradient(135deg, #5383e8 0%, #00f0ff 25%, #ff7b00 50%, #00f0ff 75%, #5383e8 100%);
+  background-size: 300% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: text-shimmer 3.2s linear infinite;
+}
+
+@keyframes rotate-border {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.premium-border-beam {
+  position: relative;
+  z-index: 10;
+  overflow: hidden;
+  background: transparent !important;
+}
+
+.premium-border-beam::before {
+  content: '';
+  position: absolute;
+  top: -150%;
+  left: -150%;
+  width: 400%;
+  height: 400%;
+  background: conic-gradient(from 0deg, rgba(56, 182, 255, 0.2) 0%, rgba(56, 182, 255, 0.2) 75%, #00D2FF 92%, #38B6FF 100%);
+  animation: rotate-border 4s linear infinite;
+  z-index: -2;
+}
+
+.premium-border-beam::after {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  background: rgba(9, 10, 15, 0.95);
+  border-radius: 11px;
+  z-index: -1;
+  transition: background-color 0.2s ease;
+}
+
+.premium-border-beam:hover::after {
+  background: rgba(24, 25, 35, 0.95);
+}

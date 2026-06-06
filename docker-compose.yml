@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: evelynn-db
+    environment:
+      POSTGRES_DB: evelynndb
+      POSTGRES_USER: evelynnuser
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U evelynnuser -d evelynndb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    image: ghcr.io/${GITHUB_REPOSITORY_OWNER}/tracker-gbk-backend:latest
+    build: ./backend
+    container_name: evelynn-backend
+    ports:
+      - "8010:8000"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://evelynnuser:${POSTGRES_PASSWORD}@db:5432/evelynndb
+      - RIOT_API_KEY=${RIOT_API_KEY}
+      - RIOT_REGION=${RIOT_REGION:-americas}
+      - RIOT_PLATFORM=${RIOT_PLATFORM:-la1}
+      - JWT_SECRET=${JWT_SECRET}
+      - ADMIN_PASSWORD_HASH=${ADMIN_PASSWORD_HASH}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    image: ghcr.io/${GITHUB_REPOSITORY_OWNER}/tracker-gbk-frontend:latest
+    build: ./frontend
+    container_name: evelynn-frontend
+    ports:
+      - "3010:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
