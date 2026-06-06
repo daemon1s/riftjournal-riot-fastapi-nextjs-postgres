@@ -2,8 +2,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.orm import selectinload
-from app.models.entities import Match, ErrorCatalog, MatchupChampions, match_errors
-from app.schemas.schemas import MatchCreate, MatchupUpdate
+from app.models.entities import Match, ErrorCatalog, MatchupChampions
+from app.schemas.schemas import MatchCreate
 from typing import List, Optional, Dict, Any
 
 class DBService:

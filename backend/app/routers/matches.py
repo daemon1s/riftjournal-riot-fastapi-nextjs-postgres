@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.database.session import get_db
 from app.services.db_service import DBService
@@ -228,4 +228,3 @@ async def delete_match(
     if not success:
         raise HTTPException(status_code=404, detail="Match not found")
     return {"message": "Match deleted successfully"}
-import httpx

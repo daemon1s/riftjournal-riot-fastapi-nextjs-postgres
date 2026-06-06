@@ -1,4 +1,3 @@
-import pytest
 from datetime import timedelta
 import jwt
 from app.services.auth_service import verify_password, create_access_token

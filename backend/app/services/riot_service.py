@@ -1,6 +1,6 @@
 import httpx
 from datetime import datetime, timezone
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 from app.config.settings import settings
 
 class RiotService:
@@ -177,7 +177,6 @@ class RiotService:
         xp_diff_10 = 0
         full_clear_time = 0
         role_quest_time = 0
-        r_ready_deaths = 0
         gank_coords = []
         death_coords = []
 
