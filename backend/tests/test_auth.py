@@ -5,7 +5,7 @@ from app.config.settings import settings
 
 def test_verify_password():
     password = "test_password"
-    hashed = "14b03704ef1a029cf05c317a6c9cf1c2656360058b76c8c4e402b374da7c6d66"
+    hashed = "10a6e6cc8311a3e2bcc09bf6c199adecd5dd59408c343e926b129c4914f3cb01"
     assert verify_password(password, hashed) is True
     assert verify_password("wrong", hashed) is False
 
