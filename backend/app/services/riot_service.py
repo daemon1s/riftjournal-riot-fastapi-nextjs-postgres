@@ -1,4 +1,5 @@
 import httpx
+import urllib.parse
 from datetime import datetime, timezone
 from typing import Dict, Any
 from app.config.settings import settings
@@ -10,7 +11,6 @@ class RiotService:
         self.headers = {"X-Riot-Token": self.api_key}
 
     async def get_puuid_by_riot_id(self, game_name: str, tag_line: str) -> str:
-        import urllib.parse
         encoded_name = urllib.parse.quote(game_name.strip())
         encoded_tag = urllib.parse.quote(tag_line.strip())
         url = f"https://{self.region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{encoded_name}/{encoded_tag}"
@@ -21,7 +21,8 @@ class RiotService:
             return data["puuid"]
 
     async def get_latest_match_id(self, puuid: str) -> str:
-        url = f"https://{self.region}.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids"
+        encoded_puuid = urllib.parse.quote(puuid.strip())
+        url = f"https://{self.region}.api.riotgames.com/lol/match/v5/matches/by-puuid/{encoded_puuid}/ids"
         params = {"start": 0, "count": 1, "queue": 420}
         async with httpx.AsyncClient() as client:
             response = await client.get(url, headers=self.headers, params=params)
@@ -37,7 +38,8 @@ class RiotService:
             return match_ids[0]
 
     async def get_recent_match_ids(self, puuid: str, count: int = 10) -> list[str]:
-        url = f"https://{self.region}.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids"
+        encoded_puuid = urllib.parse.quote(puuid.strip())
+        url = f"https://{self.region}.api.riotgames.com/lol/match/v5/matches/by-puuid/{encoded_puuid}/ids"
         params = {"start": 0, "count": count, "queue": 420}
         async with httpx.AsyncClient() as client:
             response = await client.get(url, headers=self.headers, params=params)
@@ -50,23 +52,25 @@ class RiotService:
                 match_ids = response.json()
             return match_ids or []
 
-
     async def get_match_details(self, match_id: str) -> Dict[str, Any]:
-        url = f"https://{self.region}.api.riotgames.com/lol/match/v5/matches/{match_id}"
+        encoded_match_id = urllib.parse.quote(match_id.strip())
+        url = f"https://{self.region}.api.riotgames.com/lol/match/v5/matches/{encoded_match_id}"
         async with httpx.AsyncClient() as client:
             response = await client.get(url, headers=self.headers)
             response.raise_for_status()
             return response.json()
 
     async def get_match_timeline(self, match_id: str) -> Dict[str, Any]:
-        url = f"https://{self.region}.api.riotgames.com/lol/match/v5/matches/{match_id}/timeline"
+        encoded_match_id = urllib.parse.quote(match_id.strip())
+        url = f"https://{self.region}.api.riotgames.com/lol/match/v5/matches/{encoded_match_id}/timeline"
         async with httpx.AsyncClient() as client:
             response = await client.get(url, headers=self.headers)
             response.raise_for_status()
             return response.json()
 
     async def get_summoner_rank_by_puuid(self, puuid: str) -> Dict[str, Any]:
-        url = f"https://{settings.RIOT_PLATFORM}.api.riotgames.com/lol/league/v4/entries/by-puuid/{puuid}"
+        encoded_puuid = urllib.parse.quote(puuid.strip())
+        url = f"https://{settings.RIOT_PLATFORM}.api.riotgames.com/lol/league/v4/entries/by-puuid/{encoded_puuid}"
         async with httpx.AsyncClient() as client:
             response = await client.get(url, headers=self.headers)
             response.raise_for_status()
