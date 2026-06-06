@@ -17,7 +17,7 @@ services:
       retries: 5
 
   backend:
-    image: ghcr.io/${GITHUB_REPOSITORY_OWNER}/tracker-gbk-backend:latest
+    image: ghcr.io/${GITHUB_REPOSITORY_OWNER}/riftjournal-riot-fastapi-nextjs-postgres-backend:latest
     build: ./backend
     container_name: evelynn-backend
     ports:
@@ -34,7 +34,7 @@ services:
         condition: service_healthy
 
   frontend:
-    image: ghcr.io/${GITHUB_REPOSITORY_OWNER}/tracker-gbk-frontend:latest
+    image: ghcr.io/${GITHUB_REPOSITORY_OWNER}/riftjournal-riot-fastapi-nextjs-postgres-frontend:latest
     build: ./frontend
     container_name: evelynn-frontend
     ports:
