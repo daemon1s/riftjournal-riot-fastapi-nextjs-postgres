@@ -132,7 +132,8 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             set -e
-            if [ ! -d /root/riftjournal ]; then
+            if [ ! -d /root/riftjournal/.git ]; then
+              rm -rf /root/riftjournal
               mkdir -p /root/riftjournal
               git clone https://${{ github.actor }}:${{ secrets.GB_TOKEN }}@github.com/${{ github.repository }}.git /root/riftjournal
             fi
