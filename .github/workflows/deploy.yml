@@ -132,11 +132,11 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             set -e
-            if [ ! -d /var/www/performance-tracker ]; then
-              mkdir -p /var/www/performance-tracker
-              git clone https://${{ github.actor }}:${{ secrets.GB_TOKEN }}@github.com/${{ github.repository }}.git /var/www/performance-tracker
+            if [ ! -d /root/riftjournal ]; then
+              mkdir -p /root/riftjournal
+              git clone https://${{ github.actor }}:${{ secrets.GB_TOKEN }}@github.com/${{ github.repository }}.git /root/riftjournal
             fi
-            cd /var/www/performance-tracker
+            cd /root/riftjournal
             git fetch --all
             git reset --hard origin/main
             echo "GITHUB_REPOSITORY_OWNER=${{ github.repository_owner }}" > .env
