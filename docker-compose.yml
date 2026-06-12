@@ -11,7 +11,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U evelynnuser -d evelynndb"]
+      test: [ "CMD-SHELL", "pg_isready -U evelynnuser -d evelynndb" ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -21,7 +21,7 @@ services:
     build: ./backend
     container_name: evelynn-backend
     ports:
-      - "8010:8000"
+      - "127.0.0.1:8010:8000"
     environment:
       - DATABASE_URL=postgresql+asyncpg://evelynnuser:${POSTGRES_PASSWORD}@db:5432/evelynndb
       - RIOT_API_KEY=${RIOT_API_KEY}
@@ -32,17 +32,26 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   frontend:
     image: ghcr.io/${GITHUB_REPOSITORY_OWNER}/riftjournal-riot-fastapi-nextjs-postgres-frontend:latest
     build: ./frontend
     container_name: evelynn-frontend
     ports:
-      - "3010:3000"
+      - "127.0.0.1:3010:3000"
     environment:
       - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:8000}
     depends_on:
       - backend
-
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 volumes:
   postgres_data:
