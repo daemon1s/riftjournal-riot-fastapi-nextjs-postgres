@@ -61,6 +61,41 @@ El objetivo es automatizar la auditoría de rendimiento y mentalidad para aceler
 
 ---
 
+## 📂 Estructura de carpetas
+
+El repositorio está organizado en un monorepo con la siguiente estructura de directorios:
+
+```text
+performance-tracker/
+├── .github/
+│   └── workflows/
+│       └── deploy.yml          # Pipeline de integración y despliegue continuo (CI/CD)
+├── backend/                    # Servidor de API (FastAPI)
+│   ├── app/
+│   │   ├── api/                # Enrutadores y controladores de la API (v1)
+│   │   ├── models/             # Modelos de base de datos (SQLAlchemy)
+│   │   ├── schemas/            # Schemas de validación Pydantic
+│   │   ├── services/           # Lógica de negocio (Riot API y base de datos)
+│   │   └── main.py             # Punto de entrada de la aplicación FastAPI
+│   ├── tests/                  # Pruebas unitarias y de integración (Pytest)
+│   ├── Dockerfile
+│   └── requirements.txt
+├── frontend/                   # Aplicación cliente (Next.js)
+│   ├── public/                 # Recursos gráficos y de assets (logotipos, iconos)
+│   ├── src/
+│   │   ├── app/                # Páginas, layouts y ruteo (App Router)
+│   │   ├── components/         # Componentes React reutilizables (MatchMap, LoginModal, etc.)
+│   │   ├── config/             # Constantes y configuraciones globales
+│   │   └── services/           # Clientes e integración con la API del backend
+│   ├── Dockerfile
+│   └── package.json
+├── docker-compose.yml          # Orquestación de contenedores (db, backend, frontend)
+├── sonar-project.properties    # Configuración de SonarCloud
+└── README.md
+```
+
+---
+
 ## ⚡ Cómo funciona el consumo de la API de Riot Games
 
 Cuando el administrador solicita sincronizar o previsualizar una partida, el backend de FastAPI realiza un flujo de consultas asíncronas a los servidores de Riot Games:
@@ -129,9 +164,3 @@ Para evitar colisiones en la VPS y mantener un entorno seguro, los puertos está
 - **Backend API (FastAPI)**: Escucha internamente en el puerto `8000` del contenedor y se mapea externamente al puerto **`8010`** de la VPS.
 - **Base de datos (PostgreSQL)**: Se ejecuta en un contenedor privado. Se eliminó la exposición de puertos hacia el exterior (`5432:5432` eliminado), restringiendo el acceso exclusivamente a la red interna virtual de Docker (`proxy-network`). El tráfico de base de datos está completamente aislado de internet.
 - **Nginx Proxy Manager**: Resuelve las peticiones HTTPS desde el exterior y las redirige de forma segura a los puertos locales mapeados (`3010` y `8010`).
-
----
-
-## ⚖️ Legal disclaimer
-
-RiftJournal is not endorsed by Riot Games and does not reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riot Games and all associated properties are trademarks or registered trademarks of Riot Games, Inc.

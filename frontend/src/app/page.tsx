@@ -1464,20 +1464,6 @@ export default function Home() {
         onSelectMatch={handleSelectMatch}
         isLoading={isLoadingRecent}
       />
-
-      <footer className="w-full mt-auto py-8 border-t border-[rgba(55,58,85,0.15)] bg-zinc-950/20 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-4 md:px-8 flex flex-col md:flex-row justify-between items-center gap-6 text-center md:text-left">
-          <div className="flex flex-col gap-1">
-            <span className="text-xs font-black text-white uppercase tracking-wider">RiftJournal</span>
-            <span className="text-[10px] text-muted-text uppercase tracking-widest">Performance & Mental Analytics Suite</span>
-          </div>
-          <div className="max-w-2xl">
-            <p className="text-[9px] text-muted-text/80 leading-relaxed font-mono">
-              RiftJournal is not endorsed by Riot Games and does not reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riot Games and all associated properties are trademarks or registered trademarks of Riot Games, Inc.
-            </p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
