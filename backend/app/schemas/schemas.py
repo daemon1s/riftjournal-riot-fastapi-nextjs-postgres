@@ -1,6 +1,8 @@
 from datetime import datetime
-from typing import List, Optional, Dict, Any
+from typing import Any
+
 from pydantic import BaseModel
+
 
 class ErrorCatalogResponse(BaseModel):
     id: int
@@ -12,7 +14,7 @@ class ErrorCatalogResponse(BaseModel):
 class MatchupResponse(BaseModel):
     id: int
     champion_name: str
-    counterplay: Optional[str] = None
+    counterplay: str | None = None
 
     class Config:
         from_attributes = True
@@ -23,15 +25,15 @@ class MatchupUpdate(BaseModel):
 class MatchCreate(BaseModel):
     match_id: str
     puuid: str
-    tilt_fase_maxima: Optional[str] = None
-    trigger_categoria: Optional[str] = None
-    recuperacion_tilt: Optional[str] = None
-    match_notes: Optional[str] = None
-    error_texts: List[str]
-    riot_payload_raw: Dict[str, Any]
-    user_tier: Optional[str] = None
-    user_rank: Optional[str] = None
-    user_lp: Optional[int] = None
+    tilt_fase_maxima: str | None = None
+    trigger_categoria: str | None = None
+    recuperacion_tilt: str | None = None
+    match_notes: str | None = None
+    error_texts: list[str]
+    riot_payload_raw: dict[str, Any]
+    user_tier: str | None = None
+    user_rank: str | None = None
+    user_lp: int | None = None
 
 class MatchResponse(BaseModel):
     id: int
@@ -58,29 +60,29 @@ class MatchResponse(BaseModel):
     gold_diff_most_fed_enemy: int
     largest_multikill: int
     level_6_minute: int
-    user_tier: Optional[str] = None
-    user_rank: Optional[str] = None
-    user_lp: Optional[int] = None
-    rival_jg_tier: Optional[str] = None
-    rival_jg_rank: Optional[str] = None
-    tilt_fase_maxima: Optional[str] = None
-    trigger_categoria: Optional[str] = None
-    recuperacion_tilt: Optional[str] = None
+    user_tier: str | None = None
+    user_rank: str | None = None
+    user_lp: int | None = None
+    rival_jg_tier: str | None = None
+    rival_jg_rank: str | None = None
+    tilt_fase_maxima: str | None = None
+    trigger_categoria: str | None = None
+    recuperacion_tilt: str | None = None
     pre_six_deaths: int
     gold_diff_10: int
     xp_diff_10: int
-    full_clear_time: Optional[int] = None
-    role_quest_time: Optional[int] = None
+    full_clear_time: int | None = None
+    role_quest_time: int | None = None
     is_hardcore: bool = False
-    gold_timeline: Optional[Dict[str, Any]] = None
-    match_notes: Optional[str] = None
-    errors: List[ErrorCatalogResponse]
-    game_date: Optional[datetime] = None
+    gold_timeline: dict[str, Any] | None = None
+    match_notes: str | None = None
+    errors: list[ErrorCatalogResponse]
+    game_date: datetime | None = None
     first_blood_kill: bool = False
-    gank_coords: Optional[List[Dict[str, Any]]] = None
-    death_coords: Optional[List[Dict[str, Any]]] = None
-    user_build: Optional[List[int]] = None
-    teams: Optional[Dict[str, Any]] = None
+    gank_coords: list[dict[str, Any]] | None = None
+    death_coords: list[dict[str, Any]] | None = None
+    user_build: list[int] | None = None
+    teams: dict[str, Any] | None = None
 
     class Config:
         from_attributes = True
@@ -109,25 +111,25 @@ class RiotMatchPreview(BaseModel):
     gold_diff_most_fed_enemy: int
     largest_multikill: int
     level_6_minute: int
-    user_tier: Optional[str] = None
-    user_rank: Optional[str] = None
-    user_lp: Optional[int] = None
-    rival_jg_tier: Optional[str] = None
-    rival_jg_rank: Optional[str] = None
+    user_tier: str | None = None
+    user_rank: str | None = None
+    user_lp: int | None = None
+    rival_jg_tier: str | None = None
+    rival_jg_rank: str | None = None
     pre_six_deaths: int
     gold_diff_10: int
     xp_diff_10: int
-    full_clear_time: Optional[int] = None
-    role_quest_time: Optional[int] = None
+    full_clear_time: int | None = None
+    role_quest_time: int | None = None
     is_hardcore: bool = False
-    gold_timeline: Optional[Dict[str, Any]] = None
-    riot_payload_raw: Dict[str, Any]
-    game_date: Optional[datetime] = None
+    gold_timeline: dict[str, Any] | None = None
+    riot_payload_raw: dict[str, Any]
+    game_date: datetime | None = None
     first_blood_kill: bool = False
-    gank_coords: Optional[List[Dict[str, Any]]] = None
-    death_coords: Optional[List[Dict[str, Any]]] = None
-    user_build: Optional[List[int]] = None
-    teams: Optional[Dict[str, Any]] = None
+    gank_coords: list[dict[str, Any]] | None = None
+    death_coords: list[dict[str, Any]] | None = None
+    user_build: list[int] | None = None
+    teams: dict[str, Any] | None = None
 
 
 class RecentMatchItem(BaseModel):

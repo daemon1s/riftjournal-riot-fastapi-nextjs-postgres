@@ -1,7 +1,19 @@
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, Boolean, Numeric, DateTime, Table, ForeignKey, CheckConstraint
+
+from sqlalchemy import (
+    Boolean,
+    CheckConstraint,
+    Column,
+    DateTime,
+    ForeignKey,
+    Integer,
+    Numeric,
+    String,
+    Table,
+)
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, relationship
+
 
 class Base(DeclarativeBase):
     pass

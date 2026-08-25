@@ -1,7 +1,11 @@
+from app.config.settings import settings
+from app.services.auth_service import (
+    create_access_token,
+    get_current_admin,
+    verify_password,
+)
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
-from app.services.auth_service import verify_password, create_access_token, get_current_admin
-from app.config.settings import settings
 
 router = APIRouter(prefix="/v1/auth", tags=["auth"])
 

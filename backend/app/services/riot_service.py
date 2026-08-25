@@ -1,8 +1,10 @@
-import httpx
-import urllib.parse
+﻿import urllib.parse
 from datetime import datetime, timezone
-from typing import Dict, Any
+from typing import Any
+
+import httpx
 from app.config.settings import settings
+
 
 class RiotService:
     def __init__(self):
@@ -52,7 +54,7 @@ class RiotService:
                 match_ids = response.json()
             return match_ids or []
 
-    async def get_match_details(self, match_id: str) -> Dict[str, Any]:
+    async def get_match_details(self, match_id: str) -> dict[str, Any]:
         encoded_match_id = urllib.parse.quote(match_id.strip())
         url = f"https://{self.region}.api.riotgames.com/lol/match/v5/matches/{encoded_match_id}"
         async with httpx.AsyncClient() as client:
@@ -60,7 +62,7 @@ class RiotService:
             response.raise_for_status()
             return response.json()
 
-    async def get_match_timeline(self, match_id: str) -> Dict[str, Any]:
+    async def get_match_timeline(self, match_id: str) -> dict[str, Any]:
         encoded_match_id = urllib.parse.quote(match_id.strip())
         url = f"https://{self.region}.api.riotgames.com/lol/match/v5/matches/{encoded_match_id}/timeline"
         async with httpx.AsyncClient() as client:
@@ -68,7 +70,7 @@ class RiotService:
             response.raise_for_status()
             return response.json()
 
-    async def get_summoner_rank_by_puuid(self, puuid: str) -> Dict[str, Any]:
+    async def get_summoner_rank_by_puuid(self, puuid: str) -> dict[str, Any]:
         encoded_puuid = urllib.parse.quote(puuid.strip())
         url = f"https://{settings.RIOT_PLATFORM}.api.riotgames.com/lol/league/v4/entries/by-puuid/{encoded_puuid}"
         async with httpx.AsyncClient() as client:
@@ -91,7 +93,7 @@ class RiotService:
                     }
             return {"tier": "UNRANKED", "rank": "", "lp": 0}
 
-    def process_match_payload(self, payload: Dict[str, Any], timeline_payload: Dict[str, Any], user_puuid: str) -> Dict[str, Any]:
+    def process_match_payload(self, payload: dict[str, Any], timeline_payload: dict[str, Any], user_puuid: str) -> dict[str, Any]:
         info = payload["info"]
         participants = info["participants"]
         
@@ -225,24 +227,21 @@ class RiotService:
                             if timestamp < 360000: # 6 minutes in ms
                                 pre_six_deaths += 1
                         
-                        if killer_id == participant_id or participant_id in assistants:
-                            if timestamp <= 900000: # 15 minutes in ms
-                                gank_coords.append({
-                                    "x": pos.get("x", 0),
-                                    "y": pos.get("y", 0),
-                                    "timestamp": timestamp,
-                                    "victim": id_to_champ.get(victim_id, "Unknown"),
-                                    "killer": id_to_champ.get(killer_id, "Unknown"),
-                                    "assists": [id_to_champ.get(aid, "Unknown") for aid in assistants]
-                                })
+                        if (killer_id == participant_id or participant_id in assistants) and timestamp <= 900000: # 15 minutes in ms
+                            gank_coords.append({
+                                "x": pos.get("x", 0),
+                                "y": pos.get("y", 0),
+                                "timestamp": timestamp,
+                                "victim": id_to_champ.get(victim_id, "Unknown"),
+                                "killer": id_to_champ.get(killer_id, "Unknown"),
+                                "assists": [id_to_champ.get(aid, "Unknown") for aid in assistants]
+                            })
 
                     # Check for role quest completion
                     if event.get("participantId") == participant_id:
                         evt_type = event.get("type")
                         item_id = event.get("itemId")
-                        if evt_type == "ITEM_DESTROYED" and item_id in (1101, 1102, 1103, 3867):
-                            role_quest_time = event["timestamp"] // 1000
-                        elif evt_type == "ITEM_PURCHASED" and item_id in (3869, 3870, 3871, 3875, 3876):
+                        if evt_type == "ITEM_DESTROYED" and item_id in (1101, 1102, 1103, 3867) or evt_type == "ITEM_PURCHASED" and item_id in (3869, 3870, 3871, 3875, 3876):
                             role_quest_time = event["timestamp"] // 1000
 
             if len(frames) > 10:
@@ -287,9 +286,8 @@ class RiotService:
                 if fc_frame_idx != -1:
                     full_clear_time = frames[fc_frame_idx]["timestamp"] // 1000
 
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             print(f"Error calculating advanced metrics: {e}")
-            pass
 
         game_creation_ms = info.get("gameStartTimestamp") or info.get("gameCreation") or 0
         game_date = datetime.fromtimestamp(game_creation_ms / 1000, tz=timezone.utc) if game_creation_ms else None
@@ -377,7 +375,7 @@ class RiotService:
                                 "type": m_type,
                                 "team": event_team
                             })
-        except Exception:
+        except Exception:  # noqa: BLE001, S110
             pass
 
         return {

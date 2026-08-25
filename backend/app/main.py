@@ -1,10 +1,13 @@
 import contextlib
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.database.session import engine, SessionLocal
+
+from app.database.session import SessionLocal, engine
 from app.models.entities import Base
+from app.routers import auth, errors, matches, matchups
 from app.services.db_service import DBService
-from app.routers import matches, matchups, errors, auth
+
 
 @contextlib.asynccontextmanager
 async def lifespan(app: FastAPI):

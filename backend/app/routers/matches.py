@@ -1,28 +1,33 @@
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
+﻿import asyncio
+from datetime import datetime, timezone
+
+import httpx
 from app.database.session import get_db
+from app.schemas.schemas import (
+    MatchCreate,
+    MatchResponse,
+    RecentMatchItem,
+    RiotMatchPreview,
+)
+from app.services.auth_service import get_current_admin
 from app.services.db_service import DBService
 from app.services.riot_service import RiotService
-from app.schemas.schemas import MatchCreate, MatchResponse, RiotMatchPreview, RecentMatchItem
-from app.services.auth_service import get_current_admin
-from typing import List, Optional
-import asyncio
-from datetime import datetime, timezone
-import httpx
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/v1/matches", tags=["matches"])
 riot_service = RiotService()
 
 
-@router.get("", response_model=List[MatchResponse])
-async def list_matches(db: AsyncSession = Depends(get_db)):
+@router.get("", response_model=list[MatchResponse])
+async def list_matches(db: AsyncSession = Depends(get_db)):  # noqa: B008
     return await DBService.get_matches(db)
 
 @router.get("/latest", response_model=RiotMatchPreview)
 async def get_latest_match(
-    puuid: Optional[str] = None,
-    riot_id: Optional[str] = None,
-    db: AsyncSession = Depends(get_db)
+    puuid: str | None = None,
+    riot_id: str | None = None,
+    db: AsyncSession = Depends(get_db)  # noqa: B008
 ):
     try:
         user_puuid = puuid
@@ -66,14 +71,14 @@ async def get_latest_match(
         raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:
         if isinstance(e, HTTPException):
-            raise e
+            raise
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/recent", response_model=List[RecentMatchItem])
+@router.get("/recent", response_model=list[RecentMatchItem])
 async def get_recent_matches(
-    puuid: Optional[str] = None,
-    riot_id: Optional[str] = None,
-    db: AsyncSession = Depends(get_db)
+    puuid: str | None = None,
+    riot_id: str | None = None,
+    db: AsyncSession = Depends(get_db)  # noqa: B008
 ):
     try:
         user_puuid = puuid
@@ -122,15 +127,15 @@ async def get_recent_matches(
         raise HTTPException(status_code=e.response.status_code, detail=f"Riot API error: {e.response.text}")
     except Exception as e:
         if isinstance(e, HTTPException):
-            raise e
+            raise
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/preview/{match_id}", response_model=RiotMatchPreview)
 async def get_match_preview(
     match_id: str,
-    puuid: Optional[str] = None,
-    riot_id: Optional[str] = None,
-    db: AsyncSession = Depends(get_db)
+    puuid: str | None = None,
+    riot_id: str | None = None,
+    db: AsyncSession = Depends(get_db)  # noqa: B008
 ):
     try:
         user_puuid = puuid
@@ -172,14 +177,14 @@ async def get_match_preview(
         raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:
         if isinstance(e, HTTPException):
-            raise e
+            raise
         raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.post("/save", response_model=MatchResponse)
 async def save_match(
     data: MatchCreate, 
-    db: AsyncSession = Depends(get_db),
+    db: AsyncSession = Depends(get_db),  # noqa: B008
     admin: str = Depends(get_current_admin)
 ):
     try:
@@ -215,13 +220,13 @@ async def save_match(
         return match_obj
     except Exception as e:
         if isinstance(e, HTTPException):
-            raise e
+            raise
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.delete("/{match_id}")
 async def delete_match(
     match_id: str, 
-    db: AsyncSession = Depends(get_db),
+    db: AsyncSession = Depends(get_db),  # noqa: B008
     admin: str = Depends(get_current_admin)
 ):
     success = await DBService.delete_match(db, match_id)

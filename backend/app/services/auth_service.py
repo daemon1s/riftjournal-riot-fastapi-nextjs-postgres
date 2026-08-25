@@ -1,19 +1,20 @@
-import hashlib
-import jwt
+﻿import hashlib
 from datetime import datetime, timedelta, timezone
-from fastapi import HTTPException, Security, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+
+import jwt
 from app.config.settings import settings
+from fastapi import HTTPException, Security, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 security = HTTPBearer()
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     try:
         return hashlib.sha256(plain_password.encode()).hexdigest() == hashed_password
-    except Exception:
+    except Exception:  # noqa: BLE001
         return False
 
-def create_access_token(data: dict, expires_delta: timedelta = None) -> str:
+def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
@@ -23,7 +24,7 @@ def create_access_token(data: dict, expires_delta: timedelta = None) -> str:
     encoded_jwt = jwt.encode(to_encode, settings.JWT_SECRET, algorithm="HS256")
     return encoded_jwt
 
-def get_current_admin(credentials: HTTPAuthorizationCredentials = Security(security)) -> str:
+def get_current_admin(credentials: HTTPAuthorizationCredentials = Security(security)) -> str:  # noqa: B008
     token = credentials.credentials
     try:
         payload = jwt.decode(token, settings.JWT_SECRET, algorithms=["HS256"])

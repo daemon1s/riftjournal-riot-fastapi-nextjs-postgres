@@ -1,19 +1,21 @@
+﻿from typing import Any
+
+from app.models.entities import ErrorCatalog, Match, MatchupChampions
+from app.schemas.schemas import MatchCreate
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.orm import selectinload
-from app.models.entities import Match, ErrorCatalog, MatchupChampions
-from app.schemas.schemas import MatchCreate
-from typing import List, Optional, Dict, Any
+
 
 class DBService:
     @staticmethod
-    async def get_all_errors(db: AsyncSession) -> List[ErrorCatalog]:
+    async def get_all_errors(db: AsyncSession) -> list[ErrorCatalog]:
         result = await db.execute(select(ErrorCatalog).order_by(ErrorCatalog.error_text))
         return list(result.scalars().all())
 
     @staticmethod
-    async def get_matchup_by_champion(db: AsyncSession, champion_name: str) -> Optional[MatchupChampions]:
+    async def get_matchup_by_champion(db: AsyncSession, champion_name: str) -> MatchupChampions | None:
         stmt = select(MatchupChampions).where(MatchupChampions.champion_name.ilike(champion_name))
         result = await db.execute(stmt)
         return result.scalars().first()
@@ -31,7 +33,7 @@ class DBService:
         return matchup
 
     @staticmethod
-    async def save_match(db: AsyncSession, match_data: MatchCreate, processed: Dict[str, Any]) -> Match:
+    async def save_match(db: AsyncSession, match_data: MatchCreate, processed: dict[str, Any]) -> Match:
         error_objects = []
         for text in match_data.error_texts:
             text_cleaned = text.strip()
@@ -112,7 +114,7 @@ class DBService:
         return res.scalars().first()
 
     @staticmethod
-    async def get_matches(db: AsyncSession) -> List[Match]:
+    async def get_matches(db: AsyncSession) -> list[Match]:
         stmt = select(Match).options(selectinload(Match.errors)).order_by(Match.game_date.desc(), Match.played_at.desc())
         result = await db.execute(stmt)
         return list(result.scalars().all())
@@ -131,7 +133,7 @@ class DBService:
     @staticmethod
     async def seed_initial_data(db: AsyncSession):
         errors_seed = [
-            "hacer campamentos sin saber donde está mid rival.",
+            "hacer campamentos sin saber donde estÃ¡ mid rival.",
             "gankear gente con ghost",
             "entrar sin ulti",
             "gankear weakside",
@@ -147,7 +149,7 @@ class DBService:
             "Rengar": "Rengar: Permaban",
             "Viego": "Viego: No combear si hay un aliado low HP",
             "Lee Sin": "Lee Sin: Evitar peleas en nivel 3 si tiene doble buff",
-            "Graves": "Graves: Cuidado con la invasión en el segundo buff"
+            "Graves": "Graves: Cuidado con la invasiÃ³n en el segundo buff"
         }
         for champ, counter in matchups_seed.items():
             stmt = pg_insert(MatchupChampions).values(champion_name=champ, counterplay=counter).on_conflict_do_nothing()
@@ -186,7 +188,7 @@ class DBService:
                         m.first_blood_kill = user_data.get("firstBloodKill", False)
                     
                     updated_any = True
-                except Exception as e:
+                except Exception as e:  # noqa: BLE001
                     print(f"Error backfilling match {m.match_id}: {e}")
         if updated_any:
             await db.commit()

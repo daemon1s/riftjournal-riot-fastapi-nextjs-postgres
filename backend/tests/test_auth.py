@@ -1,7 +1,9 @@
 from datetime import timedelta
+
 import jwt
-from app.services.auth_service import verify_password, create_access_token
 from app.config.settings import settings
+from app.services.auth_service import create_access_token, verify_password
+
 
 def test_verify_password():
     password = "test_password"
