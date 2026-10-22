@@ -13,7 +13,7 @@ Performance telemetry and mental tracking platform for League of Legends ranked 
 <br>
 
 <p align="center">
-  <img src="screenshots/01.png" alt="RiftJournal Overview" width="100%" />
+  <img src="01.png" alt="RiftJournal Overview" width="100%" />
 </p>
 
 ## Architecture and Design
@@ -51,26 +51,26 @@ The application uses a decoupled client-server architecture:
 
 ```
 performance-tracker/
-â”œâ”€â”€ backend/
-â”‚   â”œâ”€â”€ app/
-â”‚   â”‚   â”œâ”€â”€ config/          # Pydantic BaseSettings and env loading
-â”‚   â”‚   â”œâ”€â”€ database/        # Async SQLAlchemy engine and session pool
-â”‚   â”‚   â”œâ”€â”€ models/          # Database entities (matches, errors, matchups)
-â”‚   â”‚   â”œâ”€â”€ routers/         # API endpoints (matches, matchups, auth)
-â”‚   â”‚   â”œâ”€â”€ schemas/         # Pydantic request/response schemas
-â”‚   â”‚   â”œâ”€â”€ services/        # Riot API client and database operations
-â”‚   â”‚   â””â”€â”€ main.py          # FastAPI application entrypoint
-â”‚   â”œâ”€â”€ Dockerfile
-â”‚   â””â”€â”€ requirements.txt
-â”œâ”€â”€ frontend/
-â”‚   â”œâ”€â”€ src/
-â”‚   â”‚   â”œâ”€â”€ app/             # Next.js App Router pages and layout
-â”‚   â”‚   â”œâ”€â”€ components/      # UI components (MatchMap, modals, dropdowns)
-â”‚   â”‚   â”œâ”€â”€ config/          # Constants and Data Dragon asset references
-â”‚   â”‚   â””â”€â”€ services/        # Frontend API client
-â”‚   â”œâ”€â”€ Dockerfile
-â”‚   â””â”€â”€ package.json
-â””â”€â”€ docker-compose.yml
+├── backend/
+│   ├── app/
+│   │   ├── config/          # Pydantic BaseSettings and env loading
+│   │   ├── database/        # Async SQLAlchemy engine and session pool
+│   │   ├── models/          # Database entities (matches, errors, matchups)
+│   │   ├── routers/         # API endpoints (matches, matchups, auth)
+│   │   ├── schemas/         # Pydantic request/response schemas
+│   │   ├── services/        # Riot API client and database operations
+│   │   └── main.py          # FastAPI application entrypoint
+│   ├── Dockerfile
+│   └── requirements.txt
+├── frontend/
+│   ├── src/
+│   │   ├── app/             # Next.js App Router pages and layout
+│   │   ├── components/      # UI components (MatchMap, modals, dropdowns)
+│   │   ├── config/          # Constants and Data Dragon asset references
+│   │   └── services/        # Frontend API client
+│   ├── Dockerfile
+│   └── package.json
+└── docker-compose.yml
 ```
 
 ## Local Setup
