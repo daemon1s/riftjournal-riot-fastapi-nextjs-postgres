@@ -1,152 +1,64 @@
-name: Compilar y desplegar
+name: Deploy
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
+# Deploy simple al VPS Oracle (ARM64): el build se hace en el VPS.
+# Si el healthcheck falla, vuelve al commit anterior automaticamente.
+# Por ahora solo manual. Para deploy en cada push, agregar:
+#   push:
+#     branches: [main]
 on:
-  push:
-    branches: [main]
-    paths:
-      - "backend/**"
-      - "frontend/**"
-      - "docker-compose.yml"
-      - ".github/workflows/**"
   workflow_dispatch:
 
+concurrency:
+  group: deploy-riftjournal
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
 env:
-  REGISTRY: ghcr.io
-  BACKEND_IMAGE: ghcr.io/${{ github.repository_owner }}/riftjournal-riot-fastapi-nextjs-postgres-backend
-  FRONTEND_IMAGE: ghcr.io/${{ github.repository_owner }}/riftjournal-riot-fastapi-nextjs-postgres-frontend
+  APP_DIR: /home/ubuntu/apps/riftjournal-riot-fastapi-nextjs-postgres
+  COMPOSE_FILE: docker-compose.deploy.yml
+  HEALTH_URLS: "http://127.0.0.1:8010/v1/matches http://127.0.0.1:3010/"
 
 jobs:
-  build-and-push:
-    name: Compilar imágenes de Docker
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-
-    steps:
-      - name: Obtener el código fuente
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Configurar Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Instalar dependencias de Python
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r backend/requirements.txt
-
-      - name: Ejecutar el análisis con Ruff
-        run: ruff check backend/app backend/tests
-
-      - name: Ejecutar pruebas del backend
-        run: |
-          export DATABASE_URL="postgresql+asyncpg://evelynnuser:evelynnpassword@localhost:5432/evelynndb"
-          export RIOT_API_KEY="dummy"
-          export PYTHONPATH=backend
-          pytest --cov=backend/app --cov-report=xml:backend/coverage.xml backend/tests
-
-      - name: Configurar Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "npm"
-          cache-dependency-path: frontend/package-lock.json
-
-      - name: Instalar dependencias del frontend
-        run: |
-          cd frontend
-          npm ci
-
-      - name: Ejecutar el linter del frontend
-        run: |
-          cd frontend
-          npm run lint
-
-      - name: Ejecutar el control de tipos del frontend
-        run: |
-          cd frontend
-          npx tsc --noEmit
-
-      - name: Ejecutar pruebas del frontend
-        run: |
-          cd frontend
-          npm run test
-
-      - name: Analizar con SonarCloud
-        uses: sonarsource/sonarcloud-github-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
-      - name: Iniciar sesión en GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Configurar Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Compilar y subir la imagen del backend
-        uses: docker/build-push-action@v5
-        with:
-          context: ./backend
-          file: ./backend/Dockerfile
-          push: true
-          tags: ${{ env.BACKEND_IMAGE }}:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      - name: Compilar y subir la imagen del frontend
-        uses: docker/build-push-action@v5
-        with:
-          context: ./frontend
-          file: ./frontend/Dockerfile
-          push: true
-          tags: ${{ env.FRONTEND_IMAGE }}:latest
-          build-args: |
-            NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
   deploy:
-    name: Desplegar en la VPS
-    needs: build-and-push
     runs-on: ubuntu-latest
-
+    timeout-minutes: 25
     steps:
-      - name: Desplegar mediante SSH
+      - name: Deploy con rollback
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.HOST }}
-          username: root
+          username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          envs: APP_DIR,COMPOSE_FILE,HEALTH_URLS
           script: |
-            set -e
-            if [ ! -d /root/riftjournal/.git ]; then
-              rm -rf /root/riftjournal
-              mkdir -p /root/riftjournal
-              git clone https://${{ github.actor }}:${{ secrets.GB_TOKEN }}@github.com/${{ github.repository }}.git /root/riftjournal
-            fi
-            cd /root/riftjournal
-            git fetch --all
+            set -u
+            cd "$APP_DIR"
+
+            healthy() {
+              for i in $(seq 1 30); do
+                ok=1
+                for u in $HEALTH_URLS; do curl -fs -o /dev/null "$u" || ok=0; done
+                [ "$ok" = 1 ] && return 0
+                sleep 2
+              done
+              return 1
+            }
+
+            prev=$(git rev-parse HEAD)
+            git fetch origin main
             git reset --hard origin/main
-            echo "GITHUB_REPOSITORY_OWNER=${{ github.repository_owner }}" > .env
-            echo "NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}" >> .env
-            echo "RIOT_API_KEY=${{ secrets.RIOT_API_KEY }}" >> .env
-            echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
-            echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
-            echo "ADMIN_PASSWORD_HASH=${{ secrets.ADMIN_PASSWORD_HASH }}" >> .env
-            echo "${{ secrets.GB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-            docker compose pull
-            docker compose up -d --wait
-            docker image prune -f
+            echo "deploy: $prev -> $(git rev-parse HEAD)"
+
+            if docker compose -f "$COMPOSE_FILE" up -d --build && healthy; then
+              docker image prune -f
+              echo "OK"
+              exit 0
+            fi
+
+            echo "FALLO. Rollback a $prev"
+            git reset --hard "$prev"
+            docker compose -f "$COMPOSE_FILE" up -d --build
+            healthy && echo "rollback OK" || echo "rollback tambien fallo, revisar a mano"
+            exit 1
